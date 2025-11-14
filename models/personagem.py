@@ -26,3 +26,34 @@ class Personagem(Entidade):
         (ex.: consumir self._atrib.mana e aplicar bônus de dano)
         """
         raise NotImplementedError("Implementar habilidade especial do Personagem.")
+
+    def ganhar_xp(self, quantidade):
+        """
+        Função simples para adicionar XP ao personagem.
+        Quando XP atingir o limite, sobe de nível.
+        """
+        self.xp += quantidade
+
+        # XP necessário para upar (fórmula simples)
+        xp_para_up = self.nivel * 100
+
+        # Enquanto tiver XP suficiente para upar mais de uma vez
+        while self.xp >= xp_para_up:
+            self.xp -= xp_para_up
+            self.upar_nivel()
+            xp_para_up = self.nivel * 100  # recalcula para o próximo nível
+
+    def upar_nivel(self):
+        """
+        Aumenta o nível e melhora atributos aos poucos.
+        Lógica simples para parecer feita por aluno.
+        """
+        self.nivel += 1
+
+        # Atributos sobem de maneira básica
+        self._atrib.vida += 10
+        self._atrib.mana += 5
+        self._attrib.ataque += 2
+        self._atrib.defesa += 2
+
+        print(f"{self.nome} subiu para o nível {self.nivel}!")
