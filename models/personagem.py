@@ -26,3 +26,18 @@ class Personagem(Entidade):
         (ex.: consumir self._atrib.mana e aplicar bônus de dano)
         """
         raise NotImplementedError("Implementar habilidade especial do Personagem.")
+
+    def curar(self) -> int:
+        """
+        Restaura a vida do personagem até o valor máximo.
+        Retorna quanto foi curado.
+        """
+        vida_atual = self._atrib.vida
+        vida_max = self._atrib.vida_max
+
+        if vida_atual >= vida_max:
+            return 0  # já está com HP cheio
+
+        cura = vida_max - vida_atual
+        self._atrib.vida = vida_max
+        return cura
