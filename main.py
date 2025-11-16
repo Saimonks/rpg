@@ -6,7 +6,7 @@ def menu() -> None:
     """Menu principal do aplicativo."""
     jogo = Jogo()
     while True:
-        print("\n===== RPG OO — Menu Principal =====")
+        print("\n=== RPG OO — Menu Principal ===")
         print("[1] Criar personagem")
         print("[2] Encarar missão")
         print("[3] Salvar")
