@@ -21,9 +21,9 @@ class Jogo:
 
     def menu_criar_personagem(self) -> None:
         while True:
-            print("\n=== Criar Personagem ===\n")
-            print(f"Nome atual: {self.personagem['nome'] or '(não definido)'}")  
-            print(f"Arquétipo:  {self.personagem['arquetipo'] or '(não definido)'}\n")
+            print("\n=== Criar Personagem ===")
+            print(f"Nome atual: {self.personagem['nome'] or '(não definido)'}")
+            print(f"Arquétipo:  {self.personagem['arquetipo'] or '(não definido)'}")
             print("[1] Definir nome")
             print("[2] Escolher arquétipo")
             print("[3] Confirmar criação")
