@@ -1,4 +1,7 @@
 from __future__ import annotations
+from models.personagem import Personagem
+from models.classe import classes
+from models.equipamentos import Arma, ARMAS_INICIAIS
 
 
 class Jogo:
@@ -51,14 +54,12 @@ class Jogo:
             print(f"Nome definido: {nome}")
         else:
             print("Nome não alterado.")
-
     def _escolher_arquetipo(self) -> None:
-        print("\nArquétipos disponíveis (apenas ilustrativos):")
+        print("\nClasses disponíveis:")
         print("[1] Guerreiro")
         print("[2] Mago")
         print("[3] Arqueiro")
         print("[4] Curandeiro")
-        print("[5] Personalizado")
         escolha = input("> ").strip()
 
         mapa = {
@@ -66,29 +67,48 @@ class Jogo:
             "2": "Mago",
             "3": "Arqueiro",
             "4": "Curandeiro",
-            "5": "Personalizado",
         }
-        arq = mapa.get(escolha)
-        if arq:
-            self.personagem["arquetipo"] = arq
-            print(f"Arquétipo definido: {arq}")
+        clas = mapa.get(escolha)
+        if clas:
+            self.personagem["arquetipo"] = clas
+            print(f"Classe definida: {clas}")
         else:
-            print("Opção inválida. Arquétipo não alterado.")
+            print("Opção inválida. Classe não existe.")
 
     def _confirmar_criacao(self) -> None:
-        if not self.personagem["nome"]:
+        nome = self.personagem["nome"]
+        clas = self.personagem["arquetipo"]
+
+        if not nome:
             print("Defina um nome antes de confirmar a criação.")
             return
-        if not self.personagem["arquetipo"]:
-            print("Escolha um arquétipo antes de confirmar a criação.")
+        if not clas:
+            print("Escolha uma classe antes de confirmar a criação.")
             return
-        print("\nPersonagem criado com sucesso!")
-        print(f"Nome: {self.personagem['nome']} | Arquétipo: {self.personagem['arquetipo']}")
-        print("(Obs.: criação ilustrativa; sem atributos ainda.)")
+
+        print("\n=== Criando personagem... ===")
+
+        
+        
+
+        arma = ARMAS_INICIAIS.get(clas)
+        self.personagem_obj = Personagem(nome, clas, arma)
+
+        print("\nPersonagem criado com sucesso!\n")
+        print(f"Nome: {self.personagem_obj.nome}")
+        print(f"Classe: {self.personagem_obj.classe}")
+        print(f"Força: {self.personagem_obj._atrib.ataque}")
+        print(f"Defesa: {self.personagem_obj._atrib.defesa}")
+        print(f"Mana: {self.personagem_obj._atrib.mana}")
+        print(f"Nível: {self.personagem_obj.nivel}")
+        print(f"XP: {self.personagem_obj.xp}")
+        print(f"Vida: {self.personagem_obj._atrib.vida}/{self.personagem_obj._atrib.vida_max}")
+        print(f"Arma inicial: {self.personagem_obj.arma.nome}")
+
 
     def _ajuda_criar_personagem(self) -> None:
         print("\nAjuda — Criar Personagem")
-        print("- Defina um nome e um arquétipo para continuar.")
+        print("- Defina um nome e uma classe para continuar.")
         print("- Esta etapa não cria atributos reais; é apenas o fluxo do menu.")
         print("- Implementações futuras podem usar essas escolhas para gerar status.")
 
