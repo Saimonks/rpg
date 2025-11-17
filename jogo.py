@@ -156,6 +156,30 @@ class Jogo:
         print("- Inimigos e recompensas: (em breve)")
         print("- Regras de combate: (em breve)")
 
+    def gerar_inimigo(self) -> Inimigo:
+        dificuldade = self.missao_config["dificuldade"]
+        tabela = {
+            "Fácil": {"vida:": 30, "ataque": 5, "defesa": 2},
+            "Média": {"vida:": 50, "ataque": 10, "defesa":5},
+            "Difícil": {"vida": 80, "ataque": 16, "defesa":8},
+        }
+
+        config = tabela.get(dificuldade, tabela["Fácil"])
+        nome_inimigo = {
+            "Trilha": "Lobo selvagem",
+            "Floresta": "Vingador da Natureza",
+            "Caverna": "Morcego gigante",
+            "Ruínas": "Guardião antigo",
+        }.get(self.missao_config["cenario"], "Criatura Hostil")
+
+        inimigo = Inimigo(
+            nome=nome_inimigo,
+            vida=config["vida"],
+            ataque=config["ataque"],
+            defesa=config["defesa"],
+        )
+        return inimigo
+        
     def _iniciar_missao_placeholder(self) -> None:
         if not self.personagem["nome"]:
             print("Crie um personagem antes de iniciar uma missão.")
