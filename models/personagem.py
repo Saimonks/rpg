@@ -1,90 +1,81 @@
 from __future__ import annotations
-# Ajuste o import conforme a localização dos seus arquivos 'Entidade' e 'Atributos'
-from .base import Entidade, Atributos 
+import random
+from .base import Entidade, Atributos
 
 
 class Personagem(Entidade):
     """
     Classe base única do jogador.
-    Implementa lógica de XP/Nível e Cura, mas NÃO implementa a lógica principal de combate.
+    Implementa lógica de XP/Nível e Cura.
     """
 
-    def __init__(self, nome: str, atrib: Atributos):
-        super().__init__(nome, atrib)
+    # CORREÇÃO CRÍTICA: Adicionando 'arquetipo' no __init__.
+    def __init__(self, nome: str, atrib: Atributos, arquetipo: str = "Personalizado"): 
+        # Passa todos os argumentos para a classe Entidade
+        super().__init__(nome, atrib, arquetipo) 
         self.nivel = 1
         self.xp = 0
         
-        # --- ATENÇÃO: Adicione aqui a inicialização do HP atual ---
-        # A vida atual DEVE ser separada da vida máxima.
-        # Assumindo que self._atrib.vida_max já está definido em Atributos/Entidade
-        # Se não estiver, você precisará adicionar 'self.hp_atual = atrib.vida'
+        # HP atual é rastreado separadamente do HP máximo
         self.hp_atual = self._atrib.vida_max 
 
-
+    # --- IMPLEMENTAÇÃO T1: Dano Básico ---
     def calcular_dano_base(self) -> int:
         """
-        Deve retornar um inteiro com o dano base do personagem.
+        Dano do Personagem: Ataque Base + 1d6 (aleatório).
         """
-        raise NotImplementedError("Implementar cálculo de dano base do Personagem.")
+        dado_aleatorio = random.randint(1, 6) 
+        dano_total = self._atrib.ataque + dado_aleatorio 
+        
+        print(f"⚔️ {self.nome} ataca, causando **{dano_total}** de dano!")
+        return dano_total
+    
+    def habilidade_especial(self) -> tuple[int, int]:
+        """
+        Será sobrescrita pelas subclasses (Guerreiro/Mago).
+        Esta versão genérica não faz nada.
+        """
+        return 0, 0
 
-    def habilidade_especial(self) -> int:
-        """
-        Deve retornar dano especial (ou 0 se indisponível).
-        """
-        raise NotImplementedError("Implementar habilidade especial do Personagem.")
-    
-    # --- LÓGICA DE XP E NÍVEL (patch-5) ---
-    
+    # --- IMPLEMENTAÇÃO T6: LÓGICA DE XP E NÍVEL ---
     def ganhar_xp(self, quantidade: int):
-        """
-        Função para adicionar XP ao personagem e verificar se sobe de nível.
-        """
-        if quantidade < 0:
-            return # Não processa XP negativo
+        """Função para adicionar XP ao personagem e verificar se sobe de nível."""
+        if quantidade <= 0: return 
             
         self.xp += quantidade
         print(f"{self.nome} ganhou {quantidade} de XP.")
 
-        # XP necessário para upar (fórmula simples: 100 * Nível)
         xp_para_up = self.nivel * 100
 
-        # Loop para garantir que o personagem sobe múltiplos níveis se ganhar muito XP
         while self.xp >= xp_para_up:
             self.xp -= xp_para_up
             self.upar_nivel()
-            xp_para_up = self.nivel * 100  # Recalcula para o próximo nível
+            xp_para_up = self.nivel * 100 
 
     def upar_nivel(self):
-        """
-        Aumenta o nível e melhora atributos.
-        """
+        """Aumenta o nível e melhora atributos."""
         self.nivel += 1
 
-        # Aumenta os atributos base (MAX)
-        # Assumindo que você mudou 'vida' para 'vida_max' na classe Atributos
+        # Aumenta atributos (Max e Atual)
         self._atrib.vida_max += 10
-        self._atrib.mana += 5
-        self._atrib.ataque += 2  # <--- CORRIGIDO: de '_attrib' para '_atrib'
+        self._atrib.mana_max += 5
+        self._atrib.ataque += 2 
         self._atrib.defesa += 2
 
-        # Cura o personagem COMPLETAMENTE ao subir de nível
+        # Cura completa e restaura mana ao subir de nível
         self.hp_atual = self._atrib.vida_max 
+        self._atrib.mana = self._atrib.mana_max 
 
         print(f"\n🎉 {self.nome} subiu para o nível {self.nivel}!")
         print(f"Status Atual: HP: {self.hp_atual}/{self._atrib.vida_max} | ATK: {self._atrib.ataque}")
 
-    # --- LÓGICA DE CURA (método de cura) ---
-    
     def curar(self) -> int:
-        """
-        Restaura a vida do personagem até o valor máximo.
-        Retorna quanto foi curado.
-        """
+        """Restaura a vida do personagem até o valor máximo."""
         vida_max = self._atrib.vida_max
         
         if self.hp_atual >= vida_max:
-            return 0  # Já está com HP cheio
+            return 0 
 
         cura = vida_max - self.hp_atual
-        self.hp_atual = vida_max # Seta o HP atual para o máximo
+        self.hp_atual = vida_max
         return cura
