@@ -1,16 +1,21 @@
 from __future__ import annotations
 from dataclasses import dataclass
+<<<<<<< HEAD
 import random
 from models.equipamentos import Arma
 
+=======
+>>>>>>> main
 
 @dataclass
 class Atributos:
     """Estrutura simples de atributos."""
+    vida: int
     ataque: int
     defesa: int
     vida: int
     mana: int = 0
+<<<<<<< HEAD
     chance_crit: float = 0.05
     multi_crit: float = 2.0
     vida_max: int | None = None
@@ -21,14 +26,27 @@ class Entidade:
     """Base para Personagem e Inimigo (sem regras avançadas)."""
 
     def __init__(self, nome: str, atrib: Atributos, arma: Arma | None = None):
+=======
+    vida_max: int | None = None
+    mana_max: int | None = None 
+
+class Entidade:
+    """Base para Personagem e Inimigo (sem regras avançadas)."""
+    def __init__(self, nome: str, atrib: Atributos):
+>>>>>>> main
         self._nome = nome
+        
         if atrib.vida_max is None:
             atrib.vida_max = atrib.vida
+        
+        if atrib.mana_max is None:
+            atrib.mana_max = atrib.mana 
+            
         self._atrib = atrib
-        self._arma = arma
 
     @property
     def nome(self) -> str:
+        """Retorna o nome da Entidade."""
         return self._nome
     @property
     def arma(self) -> Arma | None:
@@ -39,42 +57,20 @@ class Entidade:
         self._arma = nova_arma
     @property
     def vivo(self) -> bool:
+        """Verifica se a Entidade está viva."""
         return self._atrib.vida > 0
 
     def atacar(self) -> int:
-
-        dano = self._atrib.ataque
-
-
-        if self.arma:
-            dano += self.arma.dano
-
-        chance_crit = self._atrib.chance_crit
-        multi_crit = self._atrib.multi_crit
-
-        if self.arma:
-            chance_crit += self._arma.chance_crit
-            multi_crit = max(multi_crit, self._arma.multi_crit)
-
-        if random.random() < chance_crit:
-            return int(dano * multi_crit)
-
-        return dano
-
+        """Ataque base fixo (placeholder)."""
+        return self._atrib.ataque
 
     def receber_dano(self, dano: int) -> int:
-        
-        defesa = self._atrib.defesa
-
-        if random.random() < 0.10:
-            efetivo = dano
-        else:
-            efetivo = max(1, dano - defesa)
-        
+        """Dano efetivo simples (placeholder)."""
+        efetivo = max(0, dano - self._atrib.defesa)
         self._atrib.vida = max(0, self._atrib.vida - efetivo)
-
         return efetivo
     
+<<<<<<< HEAD
     def atacar_alvo(self, alvo: "Entidade") -> int:
         dano = self.atacar()                # calcula o dano (com crítico, arma, etc)
         efetivo = alvo.receber_dano(dano)   # aplica o dano no alvo
@@ -99,3 +95,26 @@ class Entidade:
 
         barra = f"{cor}[{'#' * cheio}{'-' * vazio}]{reset} {vida}/{vida_max} HP"
         return barra
+=======
+    def consumir_mana(self, custo: int) -> bool:
+        """Tenta consumir a mana e retorna True se conseguir."""
+        if self._atrib.mana >= custo:
+            self._atrib.mana -= custo
+            return True
+        return False
+
+    def barra_hp(self, largura: int = 20) -> str:
+        """Barra de HP meramente visual (placeholder)."""
+        v = max(0, self._atrib.vida)
+        vmax = max(1, self._atrib.vida_max or v)
+        cheio = int(largura * v / vmax)
+    
+        return "[" + "❤️" * cheio + "-" * (largura - cheio) + f"] {v}/{vmax} HP"
+
+    def barra_mana(self, largura: int = 20) -> str:
+        """Barra de Mana visual."""
+        v = max(0, self._atrib.mana)
+        vmax = max(1, self._atrib.mana_max or v)
+        cheio = int(largura * v / vmax)
+        return "[" + "💧" * cheio + "-" * (largura - cheio) + f"] {v}/{vmax} MP"
+>>>>>>> main
