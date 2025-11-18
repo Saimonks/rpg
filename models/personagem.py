@@ -18,17 +18,9 @@ class Personagem(Entidade):
         
         # HP atual é rastreado separadamente do HP máximo
         self.hp_atual = self._atrib.vida_max 
+        self.arma = None
 
-    # --- IMPLEMENTAÇÃO T1: Dano Básico ---
-    def calcular_dano_base(self) -> int:
-        """
-        Dano do Personagem: Ataque Base + 1d6 (aleatório).
-        """
-        dado_aleatorio = random.randint(1, 6) 
-        dano_total = self._atrib.ataque + dado_aleatorio 
-        
-        print(f"⚔️ {self.nome} ataca, causando **{dano_total}** de dano!")
-        return dano_total
+    # --- IMPLEMENTAÇÃO T1: Dano Básico  ==  RETIRADO, AGR SE ENCONTRA NO BASE.PY---
     
     def habilidade_especial(self) -> tuple[int, int]:
         """

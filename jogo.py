@@ -112,6 +112,10 @@ class Jogo:
 
         print(f"\nPersonagem {arquetipo} criado: {self.personagem.nome}!")
         print(f"HP inicial: {self.personagem.hp_atual}/{self.personagem._atrib.vida_max}")
+        print(f"Mana inicial: {self.personagem.atrib.mana}/{self.personagem._atrib.mana_max}")
+        print(f"ataque: {self.personagem.atrib.ataque}")
+        print(f"defesa: {self.personagem.atrib.defesa}")
+        print(f"Arma: {self.personagem.arma.nome} ({self.personagem.arma.raridade.name})")
 
     def _ajuda_criar_personagem(self) -> None:
         print("\nAjuda — Criar Personagem")

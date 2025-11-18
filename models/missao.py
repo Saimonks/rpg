@@ -46,7 +46,7 @@ class Missao:
             dano_causado = 0
 
             if op == "1":
-                dano_causado = p.calcular_dano_base()
+                dano_causado = p.atacar()
             
             elif op == "2":
                 dano_causado, _ = p.habilidade_especial() # Retorna dano e custo (ignorado aqui)

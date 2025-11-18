@@ -2,7 +2,7 @@ from __future__ import annotations
 import random
 from .base import Entidade, Atributos
 from .personagem import Personagem
-
+from .equipamentos import gerar_arma_por_raridade,  gerar_arma_mago, Raridade
 
 class Guerreiro(Personagem):
     """
@@ -20,10 +20,15 @@ class Guerreiro(Personagem):
             defesa=8, 
             mana=30, 
             mana_max=30, 
-            vida_max=120
+            vida_max=120,
+            chance_crit = 0.05,
+            multi_crit = 2.0 
         )
         # Chama o construtor da classe Personagem (que espera 'atrib')
         super().__init__(nome, atributos, arquetipo="Guerreiro") 
+           
+        self.arma = gerar_arma_por_raridade(Raridade.COMUM)
+        
 
     
     def habilidade_especial(self) -> tuple[int, int]:
@@ -56,11 +61,14 @@ class Mago(Personagem):
             defesa=5, 
             mana=50, 
             mana_max=50, 
-            vida_max=80
+            vida_max=80,
+            chance_crit = 0.05,
+            multi_crit = 2.5 
+
         )
         super().__init__(nome, atributos, arquetipo="Mago") 
+        self.arma = gerar_arma_mago(Raridade.COMUM)
 
-    
     def habilidade_especial(self) -> tuple[int, int]:
         """Conjura uma Bola de Fogo, consumindo Mana."""
         

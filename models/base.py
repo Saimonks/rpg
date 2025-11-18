@@ -9,6 +9,8 @@ class Atributos:
     vida: int
     ataque: int
     defesa: int
+    chance_crit: float
+    multi_crit: float 
     mana: int = 0
     vida_max: int | None = None
     mana_max: int | None = None 
@@ -58,11 +60,32 @@ class Entidade:
     @property
     def vivo(self) -> bool:
         """Verifica se a Entidade está viva (usando a vida atual do Atributos)."""
-        return self._atrib.vida > 0 
+        return self._atrib.vida > 0
 
     def atacar(self) -> int:
-        """Ataque base fixo para Inimigos (Personagem sobrescreve)."""
-        return self._atrib.ataque
+        # Base + dado 1d6
+        dano = self._atrib.ataque + random.randint(1, 6)
+
+        # --- Arma ---
+        if hasattr(self, "arma") and self.arma:
+            dano += self.arma.dano
+
+        # --- Crítico ---
+        chance_crit = self._atrib.chance_crit
+        multi_crit = self._atrib.multi_crit
+
+        if hasattr(self, "arma") and self.arma:
+            chance_crit += self.arma.chance_crit
+            multi_crit = max(multi_crit, self.arma.multi_crit)
+
+        # Aplicar crítico
+        if random.random() < chance_crit:
+            dano = int(dano * multi_crit)
+            print(f"💥 CRÍTICO de {self.nome}! ({dano} de dano)")
+        else:
+            print(f"⚔️ {self.nome} atacou e causou {dano} de dano.")
+
+        return dano
 
     def receber_dano(self, dano: int) -> int:
         """Processa o dano recebido, subtraindo a defesa."""
