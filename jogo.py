@@ -5,6 +5,7 @@ from models.personagem import Personagem
 from models.classes import Guerreiro, Mago
 from models.base import Atributos # Necessário para a desserialização (Carregar)
 from utils.repositorio import Repositorio # Necessário para Save/Load
+from models.inventario import InventarioController
 
 
 class Jogo:
@@ -123,6 +124,42 @@ class Jogo:
         print("- Esta etapa não cria atributos reais; é apenas o fluxo do menu.")
         print("- Implementações futuras podem usar essas escolhas para gerar status.")
 
+    def menu_inventario(self):
+     
+        if not isinstance(self.personagem, Personagem):
+            print("Crie ou carregue um personagem antes.")
+            return
+
+        inv = InventarioController(self.personagem)
+
+        while True:
+            print("\n=== INVENTÁRIO ===")
+            print("[1] Ver itens")
+            print("[2] Equipar item")
+            print("[3] Desequipar arma")
+            print("[4] Desequipar armadura")
+            print("[0] Voltar")
+            op = input("> ")
+
+            if op == "1":
+                inv.listar()
+
+            elif op == "2":
+                inv.personagem.inventario.listar()
+                idx = int(input("Índice do item: "))
+                inv.equipar_por_indice(idx)
+
+            elif op == "3":
+                inv.desequipar_arma()
+
+            elif op == "4":
+                inv.desequipar_armadura()
+
+            elif op == "0":
+                break
+
+
+        
     def menu_missao(self) -> None:
         while True:
             print("\n=== Missão ===")

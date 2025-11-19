@@ -131,3 +131,102 @@ def gerar_drop_arma_mago() -> Arma:
 
     return gerar_arma_mago(raridade)
 
+
+
+# ARMADURAS 
+
+
+
+class Armadura(Equipamento):
+    def __init__(self, nome: str, defesa: int, raridade: Raridade):
+        super().__init__(nome, raridade)
+        self.defesa = defesa
+
+    def detalhes(self):
+        return (
+            f"Armadura {self.nome}\n"
+            f"Raridade: {self.raridade.name}\n"
+            f"Defesa: +{self.defesa}"
+        )
+
+TABELA_ARMADURAS = {
+    Raridade.COMUM: [
+        ("Roupa de Linho", 1),
+        ("Armadura de Couro Velha", 2),
+    ],
+    Raridade.INCOMUM: [
+        ("Cota de Couro Reforçada", 4),
+        ("Armadura de Ferro Leve", 5),
+    ],
+    Raridade.RARO: [
+        ("Cota de Malha", 7),
+        ("Armadura de Aço Polido", 8),
+    ],
+    Raridade.EPICO: [
+        ("Armadura Dracônica", 12),
+        ("Placas Rúnicas", 14),
+    ],
+    Raridade.LENDARIO: [
+        ("Armadura do Rei Ancestral", 20),
+        ("Couraça Celestial", 22),
+    ]
+}
+def gerar_armadura_guerreiro(raridade: Raridade) -> Armadura:
+    nome, defesa = random.choice(TABELA_ARMADURAS[raridade])
+    return Armadura(nome, defesa, raridade)
+
+
+def gerar_drop_armadura() -> Armadura:
+    chance = random.random()
+
+    if chance < 0.60: raridade = Raridade.COMUM
+    elif chance < 0.85: raridade = Raridade.INCOMUM
+    elif chance < 0.95: raridade = Raridade.RARO
+    elif chance < 0.99: raridade = Raridade.EPICO
+    else: raridade = Raridade.LENDARIO
+
+    return gerar_armadura_guerreiro(raridade)
+
+TABELA_ARMADURAS_MAGOS = {
+    Raridade.COMUM: [
+        ("Manto Simples",  2),
+        ("Túnica de Algodão", 1, 3),
+    ],
+    Raridade.INCOMUM: [
+        ("Manto Encantado", 4),
+        ("Túnica de Seda Arcana", 5),
+    ],
+    Raridade.RARO: [
+        ("Manto dos Elementos", 7),
+        ("Túnica Estelar", 6),
+    ],
+    Raridade.EPICO: [
+        ("Manto Arcano Superior", 10),
+        ("Túnica do Vazio", 12),
+    ],
+    Raridade.LENDARIO: [
+        ("Manto do Arquimago Supremo", 15),
+        ("Túnica do Sábio Eterno", 18),
+    ]
+}
+
+def gerar_armadura_mago(raridade: Raridade) -> Armadura:
+    lista = TABELA_ARMADURAS_MAGOS[raridade]
+    nome, defesa = random.choice(lista)
+    return Armadura(nome, defesa, raridade)
+
+def gerar_drop_armadura_mago() -> Armadura:
+    chance = random.random()
+
+    if chance < 0.60:
+        raridade = Raridade.COMUM
+    elif chance < 0.85:
+        raridade = Raridade.INCOMUM
+    elif chance < 0.95:
+        raridade = Raridade.RARO
+    elif chance < 0.99:
+        raridade = Raridade.EPICO
+    else:
+        raridade = Raridade.LENDARIO
+
+    return gerar_armadura_mago(raridade)

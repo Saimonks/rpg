@@ -1,7 +1,8 @@
 from __future__ import annotations
 import random
 from .base import Entidade, Atributos
-
+from .inventario import Inventario
+from .equipamentos import Arma, Armadura
 
 class Personagem(Entidade):
     """
@@ -18,7 +19,57 @@ class Personagem(Entidade):
         
         # HP atual é rastreado separadamente do HP máximo
         self.hp_atual = self._atrib.vida_max 
+        self.inventario = Inventario()
+        self.armadura = None
         self.arma = None
+
+    def equipar(self, item):
+
+        # Equipar arma
+        if isinstance(item, Arma):
+            if self.arma:
+                # mover arma atual para inventário
+                self.inventario.adicionar(self.arma)
+
+            self.arma = item
+            print(f"⚔️ {self.nome} equipou a arma: {item.nome}")
+            return True
+
+        # Equipar armadura
+        if isinstance(item, Armadura):
+            if self.armadura:
+                self.inventario.adicionar(self.armadura)
+
+            self.armadura = item
+            print(f"🛡️ {self.nome} equipou a armadura: {item.nome}")
+            return True
+
+        print("❌ Não é possível equipar esse tipo de item.")
+        return False
+    
+    def desequipar(self, tipo: str):
+        if tipo == "arma":
+            if not self.arma:
+                print("Você não tem arma equipada.")
+                return False
+            
+            self.inventario.adicionar(self.arma)
+            print(f"🔻 Arma '{self.arma.nome}' foi movida para o inventário.")
+            self.arma = None
+            return True
+
+        if tipo == "armadura":
+            if not self.armadura:
+                print("Você não tem armadura equipada.")
+                return False
+            
+            self.inventario.adicionar(self.armadura)
+            print(f"🔻 Armadura '{self.armadura.nome}' foi movida para o inventário.")
+            self.armadura = None
+            return True
+
+        print("Tipo inválido para desequipar.")
+        return False
 
     # --- IMPLEMENTAÇÃO T1: Dano Básico  ==  RETIRADO, AGR SE ENCONTRA NO BASE.PY---
     
