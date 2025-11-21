@@ -111,20 +111,17 @@
         <tr><td>Bandagem Simples</td><td>Comum</td><td>Consumível</td><td>Restaura 15 HP fixo.</td><td>10</td></tr>
         <tr><td>Cinto de Couro</td><td>Comum</td><td>Equipamento</td><td>HP Máx +5</td><td>40</td></tr>
         <tr><td>Machado Enferrujado</td><td>Comum</td><td>Equipamento</td><td>ATK +2</td><td>60</td></tr>
-
         <tr><td><strong>Poção de Mana</strong></td><td>Incomum</td><td>Consumível</td><td>Restaura 15 MP.</td><td>35</td></tr>
         <tr><td><strong>Elmo de Ferro</strong></td><td>Incomum</td><td>Equipamento</td><td>DEF +3, HP Máx +5</td><td>150</td></tr>
         <tr><td><strong>Espada Longa</strong></td><td>Incomum</td><td>Equipamento</td><td>ATK +4</td><td>180</td></tr>
         <tr><td><strong>Adaga Amaldiçoada</strong></td><td>Incomum</td><td>Equipamento</td><td>ATK +5, HP Máx -10</td><td>200</td></tr>
         <tr><td><strong>Botas Leves</strong></td><td>Incomum</td><td>Equipamento</td><td>DEF +2, MP Máx +3</td><td>100</td></tr>
         <tr><td><strong>Cajado Simples</strong></td><td>Incomum</td><td>Equipamento</td><td>ATK +3, MP Máx +5</td><td>130</td></tr>
-
         <tr><td><strong>Amuleto da Vitalidade</strong></td><td>Raro</td><td>Equipamento</td><td>HP Máx +20, MP Máx +5</td><td>500</td></tr>
         <tr><td><strong>Pergaminho de Dano</strong></td><td>Raro</td><td>Consumível</td><td>ATK +10 Temporário.</td><td>120</td></tr>
         <tr><td><strong>Poção de Força</strong></td><td>Raro</td><td>Consumível</td><td>ATK +15 Temporário.</td><td>150</td></tr>
         <tr><td><strong>Anel de Batalha</strong></td><td>Raro</td><td>Equipamento</td><td>ATK +3, DEF +3</td><td>450</td></tr>
         <tr><td><strong>Arco de Caça</strong></td><td>Raro</td><td>Equipamento</td><td>ATK +7, HP Máx +10</td><td>600</td></tr>
-
         <tr><td><strong>Coração do Dragão</strong></td><td>Lendário</td><td>Equipamento</td><td>ATK +8, DEF +5, HP +30, MP +10</td><td>1500</td></tr>
         <tr><td><strong>Armadura de Obsidiana</strong></td><td>Lendário</td><td>Equipamento</td><td>DEF +12, HP +40, ATK -5</td><td>2000</td></tr>
         <tr><td><strong>Coroa do Conhecimento</strong></td><td>Lendário</td><td>Equipamento</td><td>MP Máx +50, HP +10, DEF +2</td><td>2200</td></tr>
