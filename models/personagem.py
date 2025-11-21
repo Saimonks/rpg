@@ -179,15 +179,25 @@ class Personagem(Entidade):
         return True
 
     def to_dict(self) -> Dict[str, Any]:
-        """Serializa o Personagem para Save/Load."""
-        return {
-            "_nome": self._nome,
-            "_arquetipo": self._arquetipo,
-            "_atrib": self._atrib.to_dict(),
-            "nivel": self.nivel,
-            "xp": self.xp,
-            "hp_atual": self.hp_atual,
-            "inventario": self.inventario.to_dict(),
-            "arma_equipada": asdict(self.arma_equipada) if self.arma_equipada else None,
-            "armadura_equipada": asdict(self.armadura_equipada) if self.armadura_equipada else None,
-        }
+        """Serializa o Personagem para Save/Load.
+           Usa chaves consistentes com a desserialização no Jogo.
+        """
+        # 1. Serializa os dados que estão em Personagem/Entidade (incluindo Atributos)
+        data = super().to_dict() # Retorna {'_nome': ..., '_arquetipo': ..., '_atrib': {...}}
+        
+        # 2. Adiciona os dados de estado específicos do Personagem
+        data["nivel"] = self.nivel
+        data["xp"] = self.xp
+        data["hp_atual"] = self.hp_atual
+        
+        # 3. Serializa Inventário (assume Inventario tem .to_dict())
+        data["inventario"] = self.inventario.to_dict()
+        
+        # 4. Serializa Equipamento usando asdict (funciona para dataclass Item)
+        # Note: 'asdict' funciona para a classe Item, se ela for um dataclass.
+        data["arma_equipada"] = asdict(self.arma_equipada) if self.arma_equipada else None
+        data["armadura_equipada"] = asdict(self.armadura_equipada) if self.armadura_equipada else None
+        
+        # 5. RETORNA O PACOTE DE DADOS DO PERSONAGEM (sem o wrapper 'personagem_data')
+        # Este formato funciona com a lógica de carregamento corrigida (que verifica o wrapper).
+        return data

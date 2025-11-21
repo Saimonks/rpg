@@ -39,7 +39,6 @@ ITENS_DROP = {
         Item("Luvas de Couro", "Equipamento", Raridade.COMUM, valor=50, stats=ItemStats(defesa=1), descricao="Aumenta levemente sua defesa."),
         Item("Bandagem Simples", "Consumível", Raridade.COMUM, valor=10, descricao="Restaura 15 HP fixo."),
         Item("Cinto de Couro", "Equipamento", Raridade.COMUM, valor=40, stats=ItemStats(vida_max=5), descricao="Aumenta ligeiramente sua vitalidade."),
-        # Arma Comum
         Item("Machado Enferrujado", "Equipamento", Raridade.COMUM, valor=60, stats=ItemStats(ataque=2), descricao="Um machado básico e pesado."),
     ],
     Raridade.INCOMUM: [
@@ -48,7 +47,6 @@ ITENS_DROP = {
         Item("Espada Longa", "Equipamento", Raridade.INCOMUM, valor=180, stats=ItemStats(ataque=4), descricao="Aumenta significativamente seu ataque."),
         Item("Adaga Amaldiçoada", "Equipamento", Raridade.INCOMUM, valor=200, stats=ItemStats(ataque=5, vida_max=-10), descricao="Alto ataque, mas drena vitalidade."),
         Item("Botas Leves", "Equipamento", Raridade.INCOMUM, valor=100, stats=ItemStats(defesa=2, mana_max=3), descricao="Defesa e um pouco de mana."),
-        # Arma Incomum
         Item("Cajado Simples", "Equipamento", Raridade.INCOMUM, valor=130, stats=ItemStats(ataque=3, mana_max=5), descricao="Arma básica para magos."),
     ],
     Raridade.RARO: [
@@ -56,7 +54,6 @@ ITENS_DROP = {
         Item("Pergaminho de Dano", "Consumível", Raridade.RARO, valor=120, descricao="Aumenta o ataque em +10 na próxima rodada (efeito no combate)."),
         Item("Poção de Força", "Consumível", Raridade.RARO, valor=150, descricao="Aumenta o dano do ataque básico em +15 temporariamente."),
         Item("Anel de Batalha", "Equipamento", Raridade.RARO, valor=450, stats=ItemStats(ataque=3, defesa=3), descricao="Um anel que equilibra ataque e defesa."),
-        # Arma Rara
         Item("Arco de Caça", "Equipamento", Raridade.RARO, valor=600, stats=ItemStats(ataque=7, vida_max=10), descricao="Permite ataques rápidos e precisos."),
     ],
     Raridade.LENDARIO: [
@@ -66,7 +63,6 @@ ITENS_DROP = {
         Item("Selo das Ruínas", "Equipamento", Raridade.LENDARIO, valor=1400, stats=ItemStats(defesa=4, vida_max=35), descricao="Proteção e vitalidade extras."),
         Item("Armadura de Obsidiana", "Equipamento", Raridade.LENDARIO, valor=2000, stats=ItemStats(defesa=12, vida_max=40, ataque=-5), descricao="Defesa impenetrável, mas é muito pesada."),
         Item("Coroa do Conhecimento", "Equipamento", Raridade.LENDARIO, valor=2200, stats=ItemStats(mana_max=50, vida_max=10, defesa=2), descricao="Aumenta drasticamente o limite de mana."),
-        # Arma Lendária
         Item("Lâmina Arcana", "Equipamento", Raridade.LENDARIO, valor=3000, stats=ItemStats(ataque=15, mana_max=20), descricao="Uma espada imbuída de magia pura."),
     ]
 }

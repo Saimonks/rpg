@@ -188,7 +188,6 @@ rpg_base_1/
 <h2>👥 Desenvolvedores</h2>
 <div>
     <ul>
-        <li>ABRAÃO CARNEIRO SERRA</li>
         <li>ÂNGELO GARDEL SANTOS DE ANDRADE</li>
         <li>DANILO JOSÉ NUNES PEREIRA</li>
         <li>ERNESTO DA SILVA PEREIRA NETO</li>
