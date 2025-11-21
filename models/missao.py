@@ -27,7 +27,6 @@ class Missao:
         """
         # Se for um Boss, o item de drop está garantido e é tratado na Missao.executar
         if dificuldade == "Boss":
-            # Item dropado pelo boss já está no inimigo
             item_nome = getattr(self.inimigo, 'item_drop_garantido', None)
             if item_nome:
                 return get_item_by_name(item_nome)

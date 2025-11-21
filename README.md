@@ -111,7 +111,7 @@
         <tr><td>Bandagem Simples</td><td>Comum</td><td>Consumível</td><td>Restaura 15 HP fixo.</td><td>10</td></tr>
         <tr><td>Cinto de Couro</td><td>Comum</td><td>Equipamento</td><td>HP Máx +5</td><td>40</td></tr>
         <tr><td>Machado Enferrujado</td><td>Comum</td><td>Equipamento</td><td>ATK +2</td><td>60</td></tr>
-        
+
         <tr><td><strong>Poção de Mana</strong></td><td>Incomum</td><td>Consumível</td><td>Restaura 15 MP.</td><td>35</td></tr>
         <tr><td><strong>Elmo de Ferro</strong></td><td>Incomum</td><td>Equipamento</td><td>DEF +3, HP Máx +5</td><td>150</td></tr>
         <tr><td><strong>Espada Longa</strong></td><td>Incomum</td><td>Equipamento</td><td>ATK +4</td><td>180</td></tr>
@@ -191,7 +191,6 @@ rpg_base_1/
 <h2>👥 Desenvolvedores</h2>
 <div>
     <ul>
-        <li>ABRAÃO CARNEIRO SERRA</li>
         <li>ÂNGELO GARDEL SANTOS DE ANDRADE</li>
         <li>DANILO JOSÉ NUNES PEREIRA</li>
         <li>ERNESTO DA SILVA PEREIRA NETO</li>

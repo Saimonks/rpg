@@ -24,6 +24,12 @@ class Repositorio:
         """Retorna o caminho completo para o arquivo."""
         return os.path.join(self.pasta_saves, nome_arquivo)
 
+    # --- NOVO MÉTODO: Checa se o Save Padrão Existe ---
+    def save_padrao_existe(self, nome_arquivo: str = "save_data.json") -> bool:
+        """Verifica se o arquivo de save padrão existe no disco."""
+        caminho = self._obter_caminho_completo(nome_arquivo)
+        return os.path.exists(caminho)
+
     def salvar(self, nome_arquivo: str, dados: dict) -> None:
         """Salva o dicionário 'dados' no arquivo especificado em formato JSON."""
         caminho = self._obter_caminho_completo(nome_arquivo)

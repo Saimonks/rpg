@@ -3,14 +3,14 @@ import random
 import sys
 from typing import Dict, Any, List, Literal, Optional
 
-# Importações de Classes e Modelos
+# Importações de Classes e Modelos (Assumimos que estão em 'models' e 'utils')
 from models.personagem import Personagem 
 from models.inimigo import Inimigo
 from models.missao import Missao, ResultadoMissao
-from models.classes import Guerreiro, Mago, Arqueiro, Curandeiro
-from models.base import Atributos
+from models.classes import Guerreiro, Mago, Arqueiro, Curandeiro # Subclasses do Personagem
+from models.base import Atributos # Dataclass para atributos
 from models.item import get_item_by_name, ITENS_DROP # Usado para Chefe e Loja
-from utils.repositorio import Repositorio
+from utils.repositorio import Repositorio # Lógica de Save/Load
 
 # ----------------------------------------------------------------------
 # --- CONSTANTES GLOBAIS ---
@@ -57,30 +57,48 @@ class Jogo:
             "dificuldade": "Fácil"
         }
         self.repositorio = Repositorio()
+        self._save_padrao = "save_data.json" # Define o nome do save padrão
 
     def menu_principal(self):
         """Método principal do loop de jogo (Menu de Navegação)."""
-        self._carregar_jogo_silencioso() # Tenta carregar o save ao iniciar
+        
+        # Tenta carregar o jogo automaticamente (útil para sessões rápidas)
+        self._carregar_jogo_silencioso(self._save_padrao) 
         
         while True:
+            # 1. Verifica se o save existe para o menu inicial
+            save_existe = self.repositorio.save_padrao_existe(self._save_padrao)
+            
             if not self.personagem:
-                # Menu de Início (Sem Personagem)
-                print("\n=== PY-RPG: NOVO JOGO ===")
-                print("[1] Criar Novo Personagem")
-                print("[2] Sair")
+                
+                # --- Menu de Início (Sem Personagem) ---
+                print("\n=== PY-RPG: BEM-VINDO ===")
+                
+                if save_existe:
+                    print("[1] Criar Novo Personagem")
+                    print("[2] Carregar Jogo Salvo")
+                    print("[3] Sair")
+                else:
+                    print("[1] Criar Novo Personagem")
+                    print("[2] Sair")
                 
                 op = input("> ").strip()
                 
                 if op == '1':
-                    self._criar_personagem() # <--- CHAMADA CORRETA
-                elif op == '2':
+                    self._criar_personagem()
+                elif op == '2' and save_existe:
+                    self._carregar_jogo_interativo(self._save_padrao)
+                elif op == '2' and not save_existe:
+                    print("Até logo!")
+                    sys.exit()
+                elif op == '3' and save_existe:
                     print("Até logo!")
                     sys.exit()
                 else:
                     print("Opção inválida.")
                 
             else:
-                # Menu Principal (Com Personagem Carregado)
+                # --- Menu Principal (Com Personagem Carregado) ---
                 print(f"\n=== RPG: {self.personagem.nome.upper()} ===")
                 print(self.personagem.barra_xp(largura=30))
                 print(f"❤️ HP: {self.personagem.hp_atual}/{self.personagem.atrib.vida_max_total} | 💰 {self.personagem.inventario.moedas} moedas")
@@ -107,7 +125,9 @@ class Jogo:
                 else:
                     print("Opção inválida.")
 
+    # --------------------------------------------------------------
     # --- FUNÇÕES DE NAVEGAÇÃO ---
+    # --------------------------------------------------------------
     
     def menu_personagem(self) -> None:
         """Menu de visualização e gerenciamento do herói."""
@@ -193,89 +213,128 @@ class Jogo:
         else:
             print(f"🛡️ {self.personagem.nome} já está com a vida máxima.")
             
-    # --- FUNÇÕES DE PERSISTÊNCIA E CARREGAMENTO ---
+    # --------------------------------------------------------------
+    # --- FUNÇÕES DE PERSISTÊNCIA E CARREGAMENTO (COM CORREÇÕES) ---
+    # --------------------------------------------------------------
 
-    def _carregar_jogo_interativo(self):
+    def _carregar_jogo_interativo(self, nome_arquivo: str = "save_data.json"):
         """Permite ao usuário carregar um save existente."""
-        nome_arquivo = input("Digite o nome do arquivo para carregar (Ex: save_data.json): ").strip() or "save_data.json"
-        
-        if self._carregar_jogo_silencioso(nome_arquivo=nome_arquivo):
-            self._salvar_jogo() # Salva automaticamente após carregar para atualizar o estado
+        if nome_arquivo == "save_data.json":
+            if not self.repositorio.save_padrao_existe(nome_arquivo):
+                 print("❌ Arquivo de save padrão não encontrado.")
+                 return
         else:
-            print("❌ Falha ao carregar o jogo.")
+             nome_arquivo = input("Digite o nome do arquivo para carregar (Ex: save_data.json): ").strip() or "save_data.json"
+        
+        if not self._carregar_jogo_silencioso(nome_arquivo=nome_arquivo):
+             print("❌ Falha ao carregar o jogo.")
 
     def _carregar_jogo_silencioso(self, nome_arquivo: str = "save_data.json") -> bool:
-        """Tenta carregar o save padrão ou especificado."""
+        """Tenta carregar o save padrão ou especificado (silenciosamente).
+           Inclui correções para desserialização de Atributos e Arquétipo.
+        """
         dados = self.repositorio.carregar(nome_arquivo)
         if not dados:
             return False
 
         try:
-            atrib_data = dados.get('personagem_data', {}).get('_atrib')
-            if not atrib_data: return False
-            atributos = Atributos(**atrib_data)
+            # 1. Tenta obter o dicionário do personagem (pode estar sob 'personagem_data' ou no root).
+            p_data = dados.get('personagem_data') 
             
-            p_data = dados.get('personagem_data', {})
-            arquetipo = p_data.get('_arquetipo')
+            # 2. Se a chave 'personagem_data' não for encontrada, assume que 'dados' é o dicionário do personagem.
+            if not isinstance(p_data, dict):
+                p_data = dados 
+                
+            # 3. Validação final da estrutura
+            if not isinstance(p_data, dict) or not p_data:
+                print("❌ Falha crítica: Os dados do save estão vazios ou corrompidos.")
+                return False
+                
+            # --- CORREÇÃO DE LEITURA DO ARQUÉTIPO ---
+            arquetipo = p_data.get('_arquetipo') 
             
-            # 1. Cria a instância correta (Desserialização)
+            classes_validas = ["Guerreiro", "Mago", "Arqueiro", "Curandeiro", "Personalizado"]
+            if not isinstance(arquetipo, str) or arquetipo not in classes_validas:
+                print(f"❌ Erro: Arquétipo desconhecido ou inválido '{arquetipo}' no save. Confirme se a chave '_arquetipo' existe no save.")
+                return False
+                
+            # 1. Desserializa Atributos
+            atrib_data = p_data.get('_atrib', {}) 
+            if not isinstance(atrib_data, dict): atrib_data = {}
+            atributos = Atributos(**atrib_data) 
+            
+            # 2. Criação da Instância Personagem
+            nome_personagem = p_data.get('_nome', 'Desconhecido')
+            p = None
+            
             if arquetipo == "Guerreiro":
-                p = Guerreiro(p_data['_nome'])
+                p = Guerreiro(nome_personagem)
             elif arquetipo == "Mago":
-                p = Mago(p_data['_nome'])
+                p = Mago(nome_personagem)
             elif arquetipo == "Arqueiro":
-                p = Arqueiro(p_data['_nome'])
+                p = Arqueiro(nome_personagem)
             elif arquetipo == "Curandeiro":
-                p = Curandeiro(p_data['_nome'])
-            else:
+                p = Curandeiro(nome_personagem)
+            
+            if p is None:
+                # Se o arquétipo for válido, mas a criação falhou (ex: Personalizado não implementado)
+                print(f"❌ Erro: Falha ao instanciar o objeto para o arquétipo '{arquetipo}'.")
                 return False
 
-            # 2. Restaura o estado atual do Personagem
+            # 3. Restaura o estado e conecta os Atributos
+            p._atrib = atributos 
             p.nivel = p_data.get('nivel', 1)
             p.xp = p_data.get('xp', 0)
-            p.hp_atual = p_data.get('hp_atual', p._atrib.vida_max_total)
-            p._atrib = atributos
-
-            # 3. Restaura Inventário
+            p.hp_atual = p_data.get('hp_atual', p._atrib.vida_max_total) 
+            
+            # 4. Restaura Inventário
             inventario_data = p_data.get('inventario')
             if inventario_data:
                 p.inventario.moedas = inventario_data.get('moedas', 0)
-                p.inventario.itens = inventario_data.get('itens', {})
+                p.inventario.itens = inventario_data.get('itens', {}) 
 
-            # 4. Restaura Equipamentos (re-equipando, o que aplica os bônus)
+            # 5. Restaura Equipamentos
             p.arma_equipada = None
             p.armadura_equipada = None
+            
+            equipados_data = []
+            arma_data = p_data.get('arma_equipada')
+            armadura_data = p_data.get('armadura_equipada')
+            
+            # Adiciona dados se forem um dicionário válido (gerado por asdict)
+            if arma_data and isinstance(arma_data, dict): equipados_data.append(arma_data)
+            if armadura_data and isinstance(armadura_data, dict): equipados_data.append(armadura_data)
 
-            if p_data.get('arma_equipada'):
-                 item_obj = get_item_by_name(p_data['arma_equipada']['nome'])
-                 if item_obj: p.inventario.adicionar_item(item_obj); p.equipar_item(item_obj.nome)
-
-            if p_data.get('armadura_equipada'):
-                 item_obj = get_item_by_name(p_data['armadura_equipada']['nome'])
-                 if item_obj: p.inventario.adicionar_item(item_obj); p.equipar_item(item_obj.nome)
+            # Re-equipa os itens, aplicando os bônus aos atributos
+            for item_data in equipados_data:
+                item_obj = get_item_by_name(item_data.get('nome')) 
+                if item_obj:
+                    # Adiciona ao inventário para que equipar_item possa removê-lo de lá
+                    p.inventario.adicionar_item(item_obj)
+                    p.equipar_item(item_obj.nome)
 
 
             self.personagem = p
             print(f"\n🎉 Personagem '{p.nome}' (Nível {p.nivel}) carregado com sucesso!")
             return True
-            
+                
         except Exception as e:
-            # Em caso de qualquer erro de desserialização, reseta o personagem
-            print(f"❌ Erro ao restaurar o objeto Personagem: {e}")
+            # Captura qualquer erro inesperado durante a desserialização
+            print(f"❌ Erro CRÍTICO ao restaurar o objeto Personagem: {type(e).__name__}: {e}")
             self.personagem = None 
             return False
 
+    # --------------------------------------------------------------
     # --- FUNÇÕES DE CRIAÇÃO E STATUS ---
+    # --------------------------------------------------------------
     
     def _criar_personagem(self) -> None:
         """Permite ao usuário criar um novo personagem."""
-        # Se um personagem existe, pergunta se deseja criar um novo (perdendo o anterior)
         if self.personagem is not None:
              confirm = input("ATENÇÃO: Criar um novo personagem perderá o atual. Continuar? (s/n): ").strip().lower()
              if confirm != 's':
                  return
-             # Se confirmar, reseta o save para garantir o permadeath
-             self.repositorio.deletar_save("save_data.json")
+             self.repositorio.deletar_save(self._save_padrao)
              self.personagem = None 
 
         print("\n--- CRIAÇÃO DE PERSONAGEM ---")
@@ -340,10 +399,23 @@ class Jogo:
                 print("❌ Não é possível salvar um personagem nocauteado! Cure-se primeiro.")
                 return
                 
-            dados_personagem = self.personagem.to_dict()
-            self.repositorio.salvar("save_data.json", dados_personagem)
+            # O to_dict do Personagem gera o dicionário do herói
+            dados_personagem_raw = self.personagem.to_dict() 
+            
+            # Empacota os dados para o Repositório (assumindo que Repositório espera uma chave principal)
+            dados_para_salvar = {'personagem_data': dados_personagem_raw} 
+
+            if dados_para_salvar:
+                 self.repositorio.salvar(self._save_padrao, dados_para_salvar)
+                 print(f"✔ Jogo salvo com sucesso em '{self._save_padrao}'.")
+            else:
+                 print("❌ Falha na serialização dos dados do personagem.")
         else:
             print("❌ Nenhuma personagem para salvar.")
+
+    # --------------------------------------------------------------
+    # --- FUNÇÕES DE LOJA ---
+    # --------------------------------------------------------------
 
     def menu_loja(self):
         """Menu principal da loja."""
@@ -396,6 +468,8 @@ class Jogo:
                         print(f"✔ Você comprou {item_nome} por {item_obj.valor} moedas.")
                     else:
                         print("❌ Moedas insuficientes.")
+                else:
+                    print("Item não encontrado ou inválido.")
             else:
                 print("Escolha inválida.")
         except ValueError:
@@ -415,15 +489,13 @@ class Jogo:
             print(f"❌ Item '{item_nome}' não encontrado no seu inventário.")
             return
 
-        # 1. Checa se o item de equipamento existe antes de acessar o nome.
         is_equipped = (self.personagem.arma_equipada is not None and item_obj.nome == self.personagem.arma_equipada.nome) or \
-                     (self.personagem.armadura_equipada is not None and item_obj.nome == self.personagem.armadura_equipada.nome)
+                      (self.personagem.armadura_equipada is not None and item_obj.nome == self.personagem.armadura_equipada.nome)
 
         if is_equipped:
             print("❌ Desequipe o item antes de vendê-lo.")
             return
 
-        # Valor de venda (usamos 50% do valor de compra para balanceamento)
         valor_venda = item_obj.valor // 2 
         
         if self.personagem.inventario.remover_item(item_nome, 1):
@@ -432,7 +504,9 @@ class Jogo:
         else:
             print("❌ Não foi possível vender o item.")
 
+    # --------------------------------------------------------------
     # --- FUNÇÕES DE AVENTURA ---
+    # --------------------------------------------------------------
                 
     def menu_aventura(self) -> None:
         """Menu de configuração e início da aventura."""
@@ -442,13 +516,11 @@ class Jogo:
             dificuldades = ["Fácil", "Média", "Difícil"]
             
             while True:
-                # Se o personagem for None durante a missão (morte), deve sair daqui também.
                 if self.personagem is None: 
                     return
 
                 print("\n--- CONFIGURAR AVENTURA ---")
                 
-                # Exibe as configurações atuais
                 print(f"Cenário Atual: {self.missao_config['cenario']}")
                 print(f"Dificuldade Atual: {self.missao_config['dificuldade']}")
                 
@@ -494,17 +566,15 @@ class Jogo:
                     
                     self.simular_missao(inimigo, dificuldade_missao)
                     
-                    # Se o personagem morreu, o simular_missao setou self.personagem = None.
                     if self.personagem is None:
-                         return # Sai do loop interno e retorna ao menu principal.
+                         return
 
                 elif op == '4':
-                    return # Sai do loop interno
+                    return
                 
                 else:
                     print("Opção inválida.")
         
-        # O loop 'while self.personagem is not None' garante que se o personagem for None, ele retorna automaticamente.
         return
 
 
@@ -520,16 +590,19 @@ class Jogo:
         print(f"Resultado: {'Vitória!' if resultado.venceu else 'Derrota!'}")
         print(f"XP Ganho: {resultado.xp_ganho}")
         
-        # --- LÓGICA DE PERMADEATH (Morte Permanente) ---
         if not resultado.venceu and self.personagem.hp_atual == 0:
             print("\n=============================================")
             print(f"💀 MORTE PERMANENTE! {self.personagem.nome} caiu em batalha.")
             print("Seu save será DELETADO. O herói não pode ser recuperado.")
             print("=============================================")
             
-            self.repositorio.deletar_save("save_data.json")
+            self.repositorio.deletar_save(self._save_padrao)
             self.personagem = None 
             
+        elif not resultado.venceu:
+             self.personagem.hp_atual = self.personagem.hp_atual if self.personagem.hp_atual > 0 else 0
+
+
     def rolar_boss_fight(self, dificuldade: str) -> Inimigo:
         """Rola um dado para ver se um Inimigo Comum ou um Chefe é gerado."""
         chance_boss = 0
@@ -543,7 +616,6 @@ class Jogo:
         if rolagem <= chance_boss:
             boss = self.gerar_boss()
             if boss:
-                print(f"\n🚨 {self.personagem.nome}, um poderoso Chefe apareceu!")
                 return boss
         
         return self.gerar_inimigo()
@@ -566,7 +638,7 @@ class Jogo:
             defesa=defesa, 
         )
         setattr(boss, 'item_drop_garantido', item_drop_nome)
-        setattr(boss, 'xp_recompensa', 500) # XP fixo alto
+        setattr(boss, 'xp_recompensa', 500)
         
         print(f"\n📢 Você encontrou o Chefe: {nome}! Prepare-se para a batalha!")
         return boss
@@ -587,5 +659,6 @@ class Jogo:
             
         vida = int(vida * multiplicador)
         ataque = int(ataque * multiplicador)
+        defesa = int(defesa * multiplicador) 
         
         return Inimigo(nome, vida, ataque, defesa)
